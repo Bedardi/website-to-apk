@@ -1,0 +1,38 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 2️⃣ Setup Java (JDK 17)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      # 3️⃣ (Optional) Generate signing key
+      - name: Generate signing key
+        run: ./make.sh keygen || echo "Skipping keygen if already exists"
+
+      # 4️⃣ Build APK
+      - name: Build APK
+        run: ./make.sh build
+
+      # 5️⃣ Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-artifact
+          path: |
+            app/build/outputs/**/*.apk
+            app/app/build/outputs/**/*.apk
